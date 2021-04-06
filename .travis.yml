@@ -1,0 +1,24 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - pwd
+  - ls ./client
+  - docker build -t geige8711/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run geige8711/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t geige8711/multi-client ./client
+  - docker build -t geige8711/multi-nginx ./nginx
+  - docker build -t geige8711/multi-server ./server
+  - docker build -t geige8711/multi-worker ./worker
+  #Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #Take those images and push them to docker hub
+  - docker push geige8711/multi-client
+  - docker push geige8711/multi-nginx
+  - docker push geige8711/multi-server
+  - docker push geige8711/multi-worker

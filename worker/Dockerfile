@@ -1,0 +1,8 @@
+FROM node:14-alpine
+WORKDIR "/app"
+COPY ./package.json ./
+RUN npm cache clean --force
+RUN rm -fr node_modules
+RUN npm install
+COPY . .
+CMD ["npm","run","start"]
